@@ -1,0 +1,265 @@
+/* overlay */
+.custom-overlay {
+    background-color: #fafafa;
+    filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.2));
+    border-radius: 10px;
+    position: relative;
+    width: auto;
+    height: auto;
+    
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    bottom: 80px;
+}
+
+.custom-overlay:after {
+    border-top: 15px solid #fafafa;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 0px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: calc(50% - 5px);
+}
+
+.custom-overlay .title {
+    display: block;
+    text-align: center;
+    padding: 10px 15px;
+    font-family: "SC Dream 6";
+    font-weight: normal;
+    font-size: 14px;
+    color: #191919;
+}
+
+.custom-overlay .price {
+    display: block;
+    text-align: center;
+    padding: 2px 10px;
+    font-family: "SC Dream 4";
+    font-weight: normal;
+    font-size: 14px;
+    color: #191919;
+}
+
+.custom-overlay .info {
+    display: block;
+    text-align: center;
+    padding: 0px 10px;
+    font-family: "SC Dream 4";
+    font-weight: normal;
+    font-size: 10px;
+    color: #191919;
+}
+
+
+.bid-overlay {
+    box-sizing: border-box;
+    background-clip: padding-box;
+    background-color: #fafafa;
+    filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.2));
+    border: 2px solid rgba(0, 0, 0, 0);
+    border-radius: 4px;
+    position: relative;
+    width: auto;
+    height: auto;
+    
+    padding: 0;
+    bottom: 80px;
+
+    cursor: pointer;
+    z-index: 20;
+}
+
+.bid-overlay:hover {
+    border: 2px solid #343a40;
+    z-index: 30;
+}
+
+.bid-overlay:after {
+    border-top: 15px solid #fafafa;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 0px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: calc(50% - 5px);
+}
+
+.bid-overlay-animation {
+    box-sizing: border-box;
+    background-clip: padding-box;
+    background-color: #fafafa;
+    filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.2));
+    border: 2px solid rgba(0, 0, 0, 0);
+    border-radius: 4px;
+    position: relative;
+    width: auto;
+    height: auto;
+    
+    padding: 0;
+    bottom: 80px;
+
+    cursor: pointer;
+    z-index: 20;
+
+    animation: motion 0.3s linear 0s infinite alternate; 
+    margin-top: 0;
+}
+
+.bid-overlay-animation:after {
+    border-top: 15px solid #fafafa;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 0px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: calc(50% - 5px);
+}
+
+@keyframes motion {
+	0% {margin-top: 0px;}
+	100% {margin-top: 10px;}
+}
+
+
+
+.bid-block {
+    background-color: #ff7d7d;
+    width: auto;
+    height: 30px;
+}
+
+.bid-title {
+    display: block;
+    text-align: center;
+    padding: 5px 15px;
+    font-family: "SC Dream 4";
+    font-weight: normal;
+    font-size: 14px;
+    color: #fafafa;
+}
+
+.bid-price {
+    display: block;
+    text-align: center;
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-family: "SC Dream 4";
+    font-weight: normal;
+    font-size: 14px;
+    color: #191919;
+}
+
+.bid-area {
+    display: block;
+    text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    font-family: "SC Dream 4";
+    font-weight: normal;
+    font-size: 8px;
+    color: #767676;
+}
+
+
+.sale-overlay {
+    box-sizing: border-box;
+    background-clip: padding-box;
+    background-color: #fafafa;
+    filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.2));
+    border: 2px solid rgba(0, 0, 0, 0);
+    border-radius: 4px;
+    position: relative;
+    width: auto;
+    height: auto;
+    
+    padding: 0;
+    bottom: 80px;
+
+    cursor: pointer;
+    z-index: 20;
+}
+
+.sale-overlay:hover {
+    border: 2px solid #343a40;
+    z-index: 30;
+}
+
+.sale-overlay:after {
+    border-top: 15px solid #fafafa;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 0px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: calc(50% - 5px);
+}
+
+
+.sale-block {
+    background-color: #0067a3;
+    width: auto;
+    height: 30px;
+}
+
+.sale-title {
+    display: block;
+    text-align: center;
+    padding: 5px 15px;
+    font-family: "SC Dream 4";
+    font-weight: normal;
+    font-size: 14px;
+    color: #fafafa;
+}
+
+.sale-price {
+    display: block;
+    text-align: center;
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-family: "SC Dream 4";
+    font-weight: normal;
+    font-size: 14px;
+    color: #191919;
+}
+
+.sale-area {
+    display: block;
+    text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    font-family: "SC Dream 4";
+    font-weight: normal;
+    font-size: 8px;
+    color: #767676;
+}
+
+
+/* else */
+body {
+    overflow-y: hidden; 
+    margin: 0px;
+
+    -ms-user-select: none;
+    -moz-user-select: -moz-none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+}
+
+
+.mobile-side-window-open-button {
+    width: 100vw;
+    height: 60px;
+}
