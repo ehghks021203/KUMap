@@ -245,6 +245,101 @@
     color: #767676;
 }
 
+.region-overlay {
+    box-sizing: border-box;
+    background-clip: padding-box;
+    background-color: #fafafa;
+    filter: drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.2));
+    border: 2px solid rgba(0, 0, 0, 0);
+    border-radius: 4px;
+    position: relative;
+    width: auto;
+    height: auto;
+    
+    padding: 0;
+    bottom: 80px;
+
+    cursor: pointer;
+    z-index: 10;
+}
+
+.region-overlay:hover {
+    border: 2px solid #343a40;
+    z-index: 30;
+}
+
+.region-high-block {
+    background-color: #f25c6f;
+    width: auto;
+    height: 30px;
+}
+
+.region-low-block {
+    background-color: #0067a3;
+    width: auto;
+    height: 30px;
+}
+
+.region-title {
+    display: block;
+    text-align: center;
+    padding: 5px 15px;
+    font-family: "SC Dream 4";
+    font-weight: normal;
+    font-size: 12px;
+    color: #fafafa;
+}
+
+.region-price {
+    display: block;
+    text-align: center;
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-family: "SC Dream 4";
+    font-weight: normal;
+    font-size: 12px;
+    color: #26282b;
+}
+
+.region-high-ratio {
+    display: block;
+    text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    font-family: "SC Dream 4";
+    font-weight: normal;
+    font-size: 8px;
+    color: #f25c6f;
+}
+
+.region-low-ratio {
+    display: block;
+    text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    font-family: "SC Dream 4";
+    font-weight: normal;
+    font-size: 8px;
+    color: #0067a3;
+}
+
+.region-cluster-text {
+    display: block;
+    margin-top: 5px;
+    font-family: "SC Dream 4";
+    font-size: 12px;
+    color: #26282b;
+}
+
+.region-cluster-highlight-text {
+    display: block;
+    font-family: "SC Dream 4";
+    font-size: 12px;
+    color: #0067a3;
+}
 
 /* else */
 body {

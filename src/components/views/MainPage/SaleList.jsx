@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import palette from '../../../lib/styles/colorPalette';
 import styled from "styled-components";
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,7 +10,7 @@ import Loading from "../../Loading";
 const SaleList = ({ isMobile=false, LoadLand }) => {
     const centerAddr = useSelector(state => state.globalValues.centerAddr);
     const saleList = useSelector(state => state.globalValues.saleList);
-    const isLoading = useSelector(state => state.globalValues.bidLoading);
+    const isLoading = useSelector(state => state.globalValues.saleLoading);
 
     function handleSalePageOpen(sale) {
         LoadLand(sale.lat, sale.lng);
@@ -28,24 +29,29 @@ const SaleList = ({ isMobile=false, LoadLand }) => {
                     {isLoading ? (
                         <Loading
                             loadingAddr={centerAddr}
-                            type="경매"
+                            type="매물"
                         />
                     ) : (
-                        saleList.map((sale, index) => {
-                            return (
-                                <SaleListButton onClick={() => handleSalePageOpen(sale)}>
-                                    <SaleListInfo>
-                                        <br/>
-                                        <AddrText>{sale.land_info.addr}</AddrText>
-                                        <DateText>{sale.reg_date}</DateText>
-                                    </SaleListInfo>
-                                    <SaleListPriceContent style={{border:"0", color:"#0067a3"}}>
-                                        <SaleListPriceTitle>매매가</SaleListPriceTitle><br/>
-                                        {Math.floor(sale.land_price).toLocaleString('ko-KR')}
-                                    </SaleListPriceContent>
-                                </SaleListButton>
-                            );
-                        }))}
+                        saleList.length === 0 ? (
+                            <NoResultsText>조건에 맞는 검색 결과가 없습니다.</NoResultsText>
+                        ) : (
+                            saleList.map((sale, index) => {
+                                return (
+                                    <SaleListButton onClick={() => handleSalePageOpen(sale)}>
+                                        <SaleListInfo>
+                                            <br/>
+                                            <AddrText>{sale.land_info.addr}</AddrText>
+                                            <DateText>{sale.reg_date}</DateText>
+                                        </SaleListInfo>
+                                        <SaleListPriceContent style={{border:"0", color:"#0067a3"}}>
+                                            <SaleListPriceTitle>매매가</SaleListPriceTitle><br/>
+                                            {Math.floor(sale.land_price).toLocaleString('ko-KR')}
+                                        </SaleListPriceContent>
+                                    </SaleListButton>
+                                );
+                            })
+                        )
+                    )}
                     <div style={{marginBottom:"50px"}}/>
                 </Content>
             </SaleListContainer>
@@ -81,6 +87,13 @@ const Content = styled.div`
     width: 100%;
     height: 100%;    
     z-index: 8;
+`
+const NoResultsText = styled.h1`
+    margin-top: 200px;
+    text-align: center;
+    font-family: "SC Dream 4";
+    font-size: 15px;
+    color: ${palette.grayB};
 `
 
 // 토지정보의 주소

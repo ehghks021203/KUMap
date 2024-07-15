@@ -30,7 +30,7 @@ function PasswordResetModal({ className, onClose, visible }) {
                 console.log(response.data.result)
                 if (response.data.result === "success") {
                     alert("이메일이 확인되었습니다. 메일로 임시비밀번호 발송하였습니다");
-                    onClose?.();
+                    //onClose?.();
                 }
             }).catch(function(error) {
                 if (error.response) {
@@ -41,7 +41,7 @@ function PasswordResetModal({ className, onClose, visible }) {
     });
 
     const handleClose = () => {
-        onClose?.();
+        //onClose?.();
     };
 
     return (

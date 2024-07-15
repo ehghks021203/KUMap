@@ -3,13 +3,18 @@ import styled from "styled-components";
 import LandInfo from "./LandInfo";
 import BidList from "./BidList";
 import SaleList from "./SaleList";
+import RegionLand from "./RegionLand";
+import ClustererLand from "./ClustererLand";
+
 
 import { useDispatch, useSelector } from 'react-redux';
 import { setLandInfo, setBidList, setSaleList, setSideStatus } from '../../../actions/globalValues';
+import { ZOOM_LEVELS, LAND_TYPES } from "../../../enums";
 
-function SideWindow ({ isMobile=false, LoadLand, setRegLandData }) {
+function SideWindow ({ isMobile=false, SelectLandByPNU, setRegLandData }) {
     // 전역 변수 관리
     const dispatch = useDispatch();
+    const selectLand = useSelector(state => state.globalValues.selectLand);
     const landInfo = useSelector(state => state.globalValues.landInfo);
     const sideStatus = useSelector(state => state.globalValues.sideStatus);
     
@@ -22,9 +27,18 @@ function SideWindow ({ isMobile=false, LoadLand, setRegLandData }) {
                     <TopButton isCheck={sideStatus === "bid_list"}  onClick={() => dispatch(setSideStatus("bid_list"))}>경매 목록</TopButton>
                     <TopButton isCheck={sideStatus === "sale_list"} onClick={() => dispatch(setSideStatus("sale_list"))}>매물 목록</TopButton>
                 </TopMenu>
-                {sideStatus === "land_info" && <LandInfo LoadLand={LoadLand} setRegLandData={setRegLandData}/>}
-                {sideStatus === "bid_list" && <BidList LoadLand={LoadLand} />}
-                {sideStatus === "sale_list" && <SaleList LoadLand={LoadLand} />}
+                {sideStatus === "land_info" && (
+                    selectLand === null ?
+                    <LandInfo SelectLandByPNU={SelectLandByPNU} setRegLandData={setRegLandData}/> :
+                    selectLand.type == LAND_TYPES.LAND_INFO ? 
+                    <LandInfo SelectLandByPNU={SelectLandByPNU} setRegLandData={setRegLandData}/> :
+                    selectLand.type == LAND_TYPES.CLUSTERER_LAND ?
+                    <ClustererLand/> :
+                    <RegionLand SelectLandByPNU={SelectLandByPNU}/>
+                )
+                }
+                {sideStatus === "bid_list" && <BidList SelectLandByPNU={SelectLandByPNU} />}
+                {sideStatus === "sale_list" && <SaleList SelectLandByPNU={SelectLandByPNU} />}
             </SideWindowContainer>
         );
     } else {

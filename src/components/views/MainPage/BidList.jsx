@@ -4,7 +4,7 @@ import styled from "styled-components";
 import palette from '../../../lib/styles/colorPalette';
 import Loading from "../../Loading";
 
-function BidList({ isMobile=false, LoadLand }) {
+function BidList({ isMobile=false, SelectLandByPNU }) {
     const centerAddr = useSelector(state => state.globalValues.centerAddr);
     const bidList = useSelector(state => state.globalValues.bidList);
     const isLoading = useSelector(state => state.globalValues.bidLoading);
@@ -18,7 +18,7 @@ function BidList({ isMobile=false, LoadLand }) {
     }
 
     function handleBidPageOpen(bid) {
-        LoadLand(bid.lat, bid.lng);
+        SelectLandByPNU(bid.lat, bid.lng, bid.pnu, bid.addr);
     }
 
     // 조건부 렌더링
@@ -30,37 +30,42 @@ function BidList({ isMobile=false, LoadLand }) {
                     <div style={{width:"500px", display:"flex", justifyContent:"space-between"}}>
                         <BidListMiniText style={{width:"130px"}}>경매 매물</BidListMiniText>
                         <BidListMiniText style={{width:"120px"}}>총 {bidList.length}개</BidListMiniText>
+                        
                     </div>
+                    <BidListMiniText style={{margin:"6px", width:"420px", textAlign:"left", color:palette.grayB, fontFamily:"SC Dream 4"}}>* 오전 1시~오전 6시에는 경매 목록이 조회되지 않을 수 있습니다.</BidListMiniText>
                     {isLoading ? (
                         <Loading
                             loadingAddr={centerAddr}
                             type="경매"
                         />
                     ) : (
-                        bidList.map((bid) => {
-                            return (
-                                <BidListButton onClick={() => handleBidPageOpen(bid)}>
-                                    <BidListInfo>
-                                        <br/>
-                                        <CaseCdText>{transCaseCd(bid.case_cd)} 물건번호 {bid.obj_nm}</CaseCdText>
-                                        <AddrText>{bid.addr}</AddrText>
-                                        <DateText>{bid.case_info.bid_date}</DateText>
-                                    </BidListInfo>
-                                    <div style={{width:"100%", height:"70px", display:"flex", justifyContent:"space-between"}}>
-                                        <BidListPriceContent>
-                                            <BidListPriceTitle>감정가</BidListPriceTitle><br/>
-                                            {Math.floor(bid.case_info.appraisal_price).toLocaleString('ko-KR')}
-                                        </BidListPriceContent>
-                                        <BidListPriceContent style={{border:"0", color:"#0067a3"}}>
-                                            <BidListPriceTitle>최저가</BidListPriceTitle><br/>
-                                            {Math.floor(bid.case_info.minimum_sale_price).toLocaleString('ko-KR')}
-                                        </BidListPriceContent>
-                                    </div>
-                                </BidListButton>
-                            );
-                        })
+                        bidList.length === 0 ? (
+                            <NoResultsText>조건에 맞는 검색 결과가 없습니다.</NoResultsText>
+                        ) : (
+                            bidList.map((bid) => {
+                                return (
+                                    <BidListButton key={bid.case_cd} onClick={() => handleBidPageOpen(bid)}>
+                                        <BidListInfo>
+                                            <br/>
+                                            <CaseCdText>{transCaseCd(bid.case_cd)} 물건번호 {bid.obj_nm}</CaseCdText>
+                                            <AddrText>{bid.addr.address}</AddrText>
+                                            <DateText>{bid.case_info.bid_date}</DateText>
+                                        </BidListInfo>
+                                        <div style={{width:"100%", height:"70px", display:"flex", justifyContent:"space-between"}}>
+                                            <BidListPriceContent>
+                                                <BidListPriceTitle>감정가</BidListPriceTitle><br/>
+                                                {Math.floor(bid.case_info.appraisal_price).toLocaleString('ko-KR')}
+                                            </BidListPriceContent>
+                                            <BidListPriceContent style={{border:"0", color:"#0067a3"}}>
+                                                <BidListPriceTitle>최저가</BidListPriceTitle><br/>
+                                                {Math.floor(bid.case_info.min_sale_price).toLocaleString('ko-KR')}
+                                            </BidListPriceContent>
+                                        </div>
+                                    </BidListButton>
+                                );
+                            })
+                        )
                     )}
-                    
                     <div style={{marginBottom:"50px"}}/>
                 </Content>
             </BidListContainer>
@@ -120,6 +125,14 @@ const Content = styled.div`
     width: 100%;
     height: 100%;    
     z-index: 8;
+`
+
+const NoResultsText = styled.h1`
+    margin-top: 171px;
+    text-align: center;
+    font-family: "SC Dream 4";
+    font-size: 15px;
+    color: ${palette.grayB};
 `
 
 // 토지정보의 주소

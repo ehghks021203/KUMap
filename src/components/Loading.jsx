@@ -1,17 +1,26 @@
 import React from "react";
 import styled from "styled-components";
 import palette from '../lib/styles/colorPalette';
-
+import { MoonLoader } from "react-spinners";
 import Spinner from "../assets/spinner/list_loading.gif";
 
 
 function Loading({ loadingAddr="", type="" }) {
-    return (
-        <Background>
-            <img src={Spinner} alt="로딩중" width="10%" />
-            <LoadingText>{loadingAddr}의 {type} 정보 로딩중..</LoadingText>
-        </Background>
-    )
+    if (type === "") {
+        return (
+            <Background>
+                <MoonLoader color={palette.blueM}/>
+                <LoadingText>데이터 로딩중..</LoadingText>
+            </Background>
+        )
+    } else {
+        return (
+            <Background>
+                <MoonLoader color={palette.blueM}/>
+                <LoadingText>{loadingAddr}의 {type} 정보 로딩중..</LoadingText>
+            </Background>
+        )
+    }
 }
 
 

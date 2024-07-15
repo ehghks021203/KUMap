@@ -1,68 +1,11 @@
-/*
-
-import { createSlice } from '@reduxjs/toolkit';
-
-const globalValuesSlice = createSlice({
-  name: 'globalValues',
-  initialState: {
-    centerAddr: "",
-    prevCenterAddr: "",
-    landInfo: null,
-    bidList: [],
-    bidLoading: false,
-    saleList: [],
-    saleLoading: false,
-    sideStatus: "land_info"
-  },
-  reducers: {
-    setCenterAddr: (state, action) => {
-        console.log(action.payload);
-        state.centerAddr = action.payload;
-    },
-    setPrevCenterAddr: (state, action) => {
-        state.centerAddr = action.payload;
-    },
-    setLandInfo: (state, action) => {
-        state.centerAddr = action.payload;
-    },
-    setBidList: (state, action) => {
-        state.centerAddr = action.payload;
-    },
-    setBidLoading: (state, action) => {
-        state.centerAddr = action.payload;
-    },
-    setSaleList: (state, action) => {
-        state.centerAddr = action.payload;
-    },
-    setSaleLoading: (state, action) => {
-        state.centerAddr = action.payload;
-    },
-    setSideStatus: (state, action) => {
-        state.centerAddr = action.payload;
-    }
-  }
-});
-
-export const { 
-    setCenterAddr, 
-    setPrevCenterAddr, 
-    setLandInfo,
-    setBidList,
-    setBidLoading,
-    setSaleList,
-    setSaleLoading,
-    setSideStatus
-} = globalValuesSlice.actions;
-export default globalValuesSlice.reducer;
-
-*/
-
 const initialState = {
-    centerAddr: "",
-    prevCenterAddr: "",
+    centerAddr: null,
+    prevCenterAddr: null,
     selectLand: null,
     landInfo: null,
     landInfoLoading: false,
+    landReportAddr: null,
+    landReportLoading: false,
     bidList: [],
     bidLoading: false,
     saleList: [],
@@ -96,6 +39,16 @@ const globalValuesReducer = (state = initialState, action) => {
             return {
                 ...state,
                 landInfoLoading: action.payload
+            };
+        case "SET_LAND_REPORT_ADDR":
+            return {
+                ...state,
+                landReportAddr: action.payload
+            };
+        case "SET_LAND_REPORT_LOADING":
+            return {
+                ...state,
+                landReportLoading: action.payload
             };
         case "SET_BID_LIST":
             return {

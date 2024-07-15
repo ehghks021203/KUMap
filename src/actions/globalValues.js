@@ -23,6 +23,16 @@ export const setLandInfoLoading = (isLoading) => ({
     payload: isLoading
 });
 
+export const setLandReportAddr = (land) => ({
+    type: "SET_LAND_REPORT_ADDR",
+    payload: land
+});
+
+export const setLandReportLoading = (isLoading) => ({
+    type: "SET_LAND_REPORT_LOADING",
+    payload: isLoading
+});
+
 export const setBidList = (bids) => ({
     type: "SET_BID_LIST",
     payload: bids

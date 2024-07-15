@@ -1,0 +1,17 @@
+.reactMarkDown {
+    font-family: "SC Dream 4";
+}
+
+.reactMarkDown h1 {
+    font-family: "SC Dream 6";
+}
+
+.reactMarkDown ul {
+    list-style: disc outside none;
+}
+  
+.reactMarkDown ul li {
+    margin-left: 0px;
+    display: list-item;
+    text-align: -webkit-match-parent;
+}

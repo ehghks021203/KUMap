@@ -3,13 +3,14 @@ import axios from "axios";
 import styled from "styled-components";
 import palette from '../../../lib/styles/colorPalette';
 import Loading from "../../Loading";
+import { BeatLoader } from "react-spinners";
 
 import { useDispatch, useSelector } from 'react-redux';
-import { setLandInfo } from '../../../actions/globalValues';
+import { setLandInfo, setLandReportAddr } from '../../../actions/globalValues';
 
 import { ReactComponent as RoadViewIcon } from "../../../assets/icons/road_view.svg";
 
-const LandInfo = ({ isMobile=false, LoadLand, setRegLandData }) => {
+const LandInfo = ({ isMobile=false, SelectLandByPNU, setRegLandData }) => {
     // 전역 변수 관리
     const dispatch = useDispatch();
     const landInfo = useSelector(state => state.globalValues.landInfo);
@@ -66,52 +67,52 @@ const LandInfo = ({ isMobile=false, LoadLand, setRegLandData }) => {
 
     useEffect(() => {
         if (landInfo === null) { return; }
-
+        
         // 토지 정보 저장
-        setLat(landInfo["lat"]);
-        setLng(landInfo["lng"]);
-        setAddress(landInfo["addr"]);
-        setPredPrice(landInfo["pred_price"]);
-        setLandPrice(landInfo["land_price"]);
-        setLandArea(landInfo["land_area"]);
-        setLandClassification(landInfo["land_classification"]);
-        setLandUseSitt(landInfo["land_use_situation"]);
-        setLandZoning(landInfo["land_zoning"]);
-        setRoadSide(landInfo["road_side"]);
-        setLandForm(landInfo["land_form"]);
-        setLandHeight(landInfo["land_height"]);
-        setLandUses(landInfo["land_uses"]);
-        setLastPredictedDate(landInfo["last_predicted_date"]);
-        setLandFeatureStdrYear(landInfo["land_feature_stdr_year"]);
+        setLat(landInfo.lat);
+        setLng(landInfo.lng);
+        setAddress(landInfo.addr);
+        setPredPrice(landInfo.land_info.predict_land_price);
+        setLandPrice(landInfo.land_info.official_land_price);
+        setLandArea(landInfo.land_info.land_area);
+        setLandClassification(landInfo.land_info.land_classification);
+        setLandUseSitt(landInfo.land_info.land_use_situation);
+        setLandZoning(landInfo.land_info.land_zoning);
+        setRoadSide(landInfo.land_info.road_side);
+        setLandForm(landInfo.land_info.land_form);
+        setLandHeight(landInfo.land_info.land_height);
+        setLandUses(landInfo.land_info.land_uses);
+        setLastPredictedDate(landInfo.last_predicted_date);
+        setLandFeatureStdrYear(landInfo.land_feature_stdr_year);
 
-        setDealChart(landInfo["deal_chart"]);
+        setDealChart(landInfo.land_trade_list);
 
-        setBidData(landInfo["bid_data"]);
-        setSaleData(landInfo["sale_data"]);
-        setTotalLike(landInfo["total_like"]);
-        setUserLike(landInfo["user_like"]);
-
+        setBidData(landInfo.bid_data);
+        setSaleData(landInfo.property_data);
+        setTotalLike(landInfo.total_like);
+        //setUserLike(landInfo["user_like"]);
+        
         // 경매 정보 저장
-        if (landInfo["bid_data"] !== null) {
-            setBidAppraisalPrice(landInfo["bid_data"]["case_info"]["appraisal_price"]);
-            setBidBillableAmount(landInfo["bid_data"]["case_info"]["billable_amount"]);
-            setBidCaseCd(landInfo["bid_data"]["case_cd"]);
-            setBidCaseReception(landInfo["bid_data"]["case_info"]["case_reception"]);
-            setBidCourtInCharge(landInfo["bid_data"]["case_info"]["court_in_charge"]);
-            setBidDate(landInfo["bid_data"]["case_info"]["bid_date"]);
-            setBidDivRequestDeadline(landInfo["bid_data"]["case_info"]["div_request_deadline"]);
-            setBidLandList(landInfo["bid_data"]["case_info"]["land_list"]);
-            setBidMinimumSalePrice(landInfo["bid_data"]["case_info"]["minimum_sale_price"]);
-            setBidStartDate(landInfo["bid_data"]["case_info"]["bid_start_date"]);
-            setBidType(landInfo["bid_data"]["case_info"]["bid_type"]);
+        if (landInfo.bid_data !== null) {
+            setBidAppraisalPrice(landInfo.bid_data.case_info.appraisal_price);
+            setBidBillableAmount(landInfo.bid_data.case_info.billable_amount);
+            setBidCaseCd(landInfo.bid_data.case_cd);
+            setBidCaseReception(landInfo.bid_data.case_info.case_reception);
+            setBidCourtInCharge(landInfo.bid_data.case_info.court_in_charge);
+            setBidDate(landInfo.bid_data.case_info.bid_date);
+            setBidDivRequestDeadline(landInfo.bid_data.case_info.div_request_deadline);
+            setBidLandList(landInfo.bid_data.case_info.land_list);
+            setBidMinimumSalePrice(landInfo.bid_data.case_info.min_sale_price);
+            setBidStartDate(landInfo.bid_data.case_info.bid_start_date);
+            setBidType(landInfo.bid_data.case_info.bid_type);
         }
 
         // 매물 정보 저장
-        if (landInfo["sale_data"] !== null) {
-            setSaleLandArea(landInfo["sale_data"]["land_area"]);
-            setSaleLandPrice(landInfo["sale_data"]["land_price"]);
-            setSaleLandSummary(landInfo["sale_data"]["land_summary"]);
-            setOwnerNickname(landInfo["sale_data"]["nickname"]);
+        if (landInfo.property_data !== null) {
+            setSaleLandArea(landInfo.property_data.land_area);
+            setSaleLandPrice(landInfo.property_data.land_price);
+            setSaleLandSummary(landInfo.property_data.land_summary);
+            setOwnerNickname(landInfo.property_data.nickname);
         }
         
         // 사이드 윈도우 지도 설정
@@ -119,14 +120,17 @@ const LandInfo = ({ isMobile=false, LoadLand, setRegLandData }) => {
         setRoadviewOn(false);
         if(iframe !== undefined) {
             // 지적도 조회
-            axios.get(`${process.env.REACT_APP_API_URL}/get_land_geometry?lat=${landInfo["lat"]}&lng=${landInfo["lng"]}`)
+            axios.get(`${process.env.REACT_APP_API_URL}/get_land_geometry?pnu=${landInfo.pnu}`)
             .then(function(geometryResponse) {
                 iframe.contentWindow.postMessage(JSON.parse(JSON.stringify(geometryResponse)), '*');
                 iframe.addEventListener("load", ev => {
                     document.getElementsByClassName("side-window-map")[0].contentWindow.postMessage(JSON.parse(JSON.stringify(geometryResponse)), '*');
                 }); //로딩이 안끝나면 여기서 처리해준다.
+            }).catch(function(error) {
+                
             });
         }
+    
     }, [landInfo]);
 
     useEffect(() => {
@@ -176,7 +180,7 @@ const LandInfo = ({ isMobile=false, LoadLand, setRegLandData }) => {
                 }
 
                 // 토지 데이터 다시 로드
-                LoadLand(lat, lng)
+                // LoadLand(lat, lng)
             })
         }
     }
@@ -195,6 +199,12 @@ const LandInfo = ({ isMobile=false, LoadLand, setRegLandData }) => {
         } 
     }
 
+    // 토지 분석서 확인하기 버튼 핸들러
+    const HandlerViewLandReportButton = () => {
+        dispatch(setLandReportAddr(selectLand));
+    }
+
+
 
     // 조건부 렌더링
     // PC 화면
@@ -210,7 +220,7 @@ const LandInfo = ({ isMobile=false, LoadLand, setRegLandData }) => {
         } else if (isLoading) {
             return (
                 <Loading
-                    loadingAddr={selectLand.addr}
+                    loadingAddr={selectLand.addr.address}
                     type="토지 정보"
                 />
             )
@@ -242,15 +252,30 @@ const LandInfo = ({ isMobile=false, LoadLand, setRegLandData }) => {
                     { bidData !== null && <BidCaseCdText>{bidCourtInCharge} {transCaseCd(bidCaseCd)}</BidCaseCdText> }
                     <LandInfoAddrText>{address}</LandInfoAddrText>
                     <DivLine/>
-                    <div style={{display:"flex", flexDirection: "column", alignItems: "center"}}>
-                        <LandInfoMiniText>토지 예측가({lastPredictedDate} 기준)</LandInfoMiniText>
-                        <LandInfoPriceText>{Math.floor(predPrice * landArea).toLocaleString('ko-KR')}원</LandInfoPriceText>
-                        <LandInfoPricePerText>{Math.floor(predPrice).toLocaleString('ko-KR')}원/m²당</LandInfoPricePerText>
-                        <div>
-                            <LandInfoMiniText>공시지가의 </LandInfoMiniText>
-                            <LandInfoMiniText style={{color: "rgba(255,99,99,1)"}}>{parseInt(predPrice / landPrice * 100)}%</LandInfoMiniText>
+                    {predPrice !== null 
+                        ? 
+                        <div style={{display:"flex", flexDirection: "column", alignItems: "center"}}>
+                            <LandInfoMiniText>토지 예측가({lastPredictedDate} 기준)</LandInfoMiniText>
+                            <LandInfoPriceText style={predPrice / landPrice > 1 ? {color: palette.redM} : {color: palette.blueM}}>{Math.floor(predPrice * landArea).toLocaleString('ko-KR')}원</LandInfoPriceText>
+                            <LandInfoPricePerText style={predPrice / landPrice > 1 ? {color: palette.redM} : {color: palette.blueM}}>{Math.floor(predPrice).toLocaleString('ko-KR')}원/m²당</LandInfoPricePerText>
+                            <div>
+                                <LandInfoMiniText>공시지가의 </LandInfoMiniText>
+                                <LandInfoMiniText style={predPrice / landPrice > 1 ? {color: palette.redM} : {color: palette.blueM}}>{parseInt(predPrice / landPrice * 100)}%</LandInfoMiniText>
+                            </div>
+                            <ViewLandReportButton onClick={() => HandlerViewLandReportButton()} >AI 토지 분석서 확인하기</ViewLandReportButton>
                         </div>
-                    </div>
+                        :
+                        <div style={{display:"flex", flexDirection: "column", alignItems: "center"}}>
+                            <LandInfoMiniText>토지 예측가</LandInfoMiniText>
+                            <br/>
+                            <BeatLoader color={palette.blueM}/>
+                            <br/>
+                            <LandInfoMiniText>토지 가격을 예측하는 중입니다...</LandInfoMiniText>
+                            
+                        </div>
+                    }
+                    
+                    
                     <DivLine/>
                     
                     { saleData !== null && (
@@ -324,15 +349,16 @@ const LandInfo = ({ isMobile=false, LoadLand, setRegLandData }) => {
                             <BidObjDiv>
                                 {bidLandList.map((land, index) => {
                                     return (
-                                        address === land.addr ?
-                                            <BidObjButton style={{textDecoration:"none", color: "#343a40", cursor:"none"}}>{land.addr}</BidObjButton>
-                                        :   <BidObjButton onClick={() => LoadLand(land.lat, land.lng)}>{land.addr}</BidObjButton>
+                                        address === land.addr.address ?
+                                            <BidObjButton style={{textDecoration:"none", color: "#343a40", cursor:"default"}}>{land.addr.address}</BidObjButton>
+                                        :   <BidObjButton onClick={() => SelectLandByPNU(land.lat, land.lng, land.pnu, land.addr)}>{land.addr.address}</BidObjButton>
                                     );
                                 })}
                             </BidObjDiv>
                             <DivLine/>
                         </div>
                     )}
+
                     <LandInfoTitleText>토지 기본 정보 (기준년도: {landFeatureStdrYear}년)</LandInfoTitleText>
                     <div style={{display:"flex", flexDirection: "row", alignItems: "center"}}>
                         <LandInfoBox>
@@ -343,6 +369,8 @@ const LandInfo = ({ isMobile=false, LoadLand, setRegLandData }) => {
                             <LandInfoSubtitleText>이용상황</LandInfoSubtitleText>
                             <LandInfoText>{landUseSitt}</LandInfoText>
                         </LandInfoBox>
+                    </div>
+                    <div style={{display:"flex", flexDirection: "row", alignItems: "center"}}>
                         <LandInfoBox>
                             <LandInfoSubtitleText>용도지역</LandInfoSubtitleText>
                             <LandInfoText>{landZoning}</LandInfoText>
@@ -361,6 +389,8 @@ const LandInfo = ({ isMobile=false, LoadLand, setRegLandData }) => {
                             <LandInfoSubtitleText>형상</LandInfoSubtitleText>
                             <LandInfoText>{landForm}</LandInfoText>
                         </LandInfoBox>
+                    </div>
+                    <div style={{display:"flex", flexDirection: "row", alignItems: "center"}}>
                         <LandInfoBox>
                             <LandInfoSubtitleText>지세</LandInfoSubtitleText>
                             <LandInfoText>{landHeight}</LandInfoText>
@@ -371,13 +401,13 @@ const LandInfo = ({ isMobile=false, LoadLand, setRegLandData }) => {
                         </LandInfoBox>
                     </div>
                     <LandInfoUsePlanBox>
-                        <LandInfoSubtitleText style={{width:"420px", marginTop:"15px", marginLeft:"2px"}}>토지 이용 계획</LandInfoSubtitleText>
-                        <LandInfoText style={{ width:"420px", height:"auto", marginLeft:"2px" }}>{landUses.replaceAll("/", ", ")}</LandInfoText>
+                        <LandInfoSubtitleText style={{width:"405px", marginTop:"15px", marginLeft:"2px"}}>토지 이용 계획</LandInfoSubtitleText>
+                        <LandInfoText style={{width:"405px", height:"auto", marginLeft:"2px"}}>{landUses.replaceAll("/", ", ")}</LandInfoText>
                     </LandInfoUsePlanBox>
                     <DivLine/>
                     <LandInfoTitleText>토지 실거래 내역</LandInfoTitleText>
                     { dealChart.length === 0 ? 
-                        <LandInfoText style={{ width:"470px", fontSize:"15px" }}>주변 지역의 실거래 내역이 없습니다.</LandInfoText>
+                        <LandInfoText style={{marginTop:"80px", width:"450px", fontSize:"15px", textAlign:"center"}}>주변 지역의 실거래 내역이 없습니다.</LandInfoText>
                     : (
                         <DealList>
                             <thead>
@@ -404,7 +434,7 @@ const LandInfo = ({ isMobile=false, LoadLand, setRegLandData }) => {
                             </tbody>
                         </DealList>
                     )}
-                    <div style={{marginBottom:"60px"}}/>
+                    <div style={{marginBottom:"150px"}}/>
                 </Content>
             </LandInfoContainer>
             );
@@ -526,8 +556,8 @@ const LikeCountText = styled.span`
     width: 100%;
     text-align: left;
     font-family: "SC Dream 4";
-    font-size: 12px;
-    color: #343a40;
+    font-size: 15px;
+    color: ${palette.blackL};
 `
 
 // 구분선
@@ -556,8 +586,8 @@ const LandInfoAddrText = styled.span`
 
     text-align: center;
     font-family: "SC Dream 6";
-    font-size: ${(props) => (props.isMobile ? "18px" : "20px")};
-    color: #343a40;
+    font-size: ${(props) => (props.isMobile ? "18px" : "22px")};
+    color: ${palette.blackB};
 `
 
 // 토지의 가격
@@ -579,6 +609,35 @@ const LandInfoPricePerText = styled.span`
     font-size: ${(props) => (props.isMobile ? "10px" : "14px")};
     color: rgba(255,99,99,1);
 `
+
+// 토지 분석서 보기 버튼
+const ViewLandReportButton = styled.button`
+    background: ${palette.blueL};
+    margin-top: 30px;
+    margin-bottom: 10px;
+
+    border: 0;
+    border-radius: 6px;
+
+    padding-left: 14px;
+    padding-right: 14px;
+    height: 56px;
+
+    text-align: center;
+    font-family: "SC Dream 4";
+    font-size: 18px;
+    color: ${palette.whiteL};
+
+    cursor: pointer;
+
+    width: ${(props) => (props.isMobile ? "90vw" : "450px")};
+
+    &:hover {
+        background: ${palette.blueB};
+        cursor: pointer;
+    }
+`
+
 
 // 매물 스타일
 const SaleAreaText = styled.span`
@@ -767,33 +826,31 @@ const LandInfoTitleText = styled.span`
     
     text-align: left;
     font-family: "SC Dream 6";
-    font-size: 18px;
+    font-size: 20px;
     color: #343a40;
 `
 
 const LandInfoSubtitleText = styled.span`
     position: relative;
     margin-top: 10px;
-    margin-left: 20px;
 
-    width: ${(props) => (props.isMobile ? "45vw" : "100px")};
+    width: ${(props) => (props.isMobile ? "45vw" : "175px")};
 
     text-align: left;
     font-family: "SC Dream 6";
-    font-size: 12px;
-    color: #343a40;
+    font-size: 18px;
+    color: ${palette.blackB};
 `
 
 const LandInfoText = styled.span`
     position: relative;
-    margin-left: 20px;
 
-    width: ${(props) => (props.isMobile ? "45vw" : "100px")};
+    width: ${(props) => (props.isMobile ? "45vw" : "175px")};
 
     text-align: left;
     font-family: "SC Dream 4";
-    font-size: 10px;
-    color: #343a40;
+    font-size: 15px;
+    color: ${palette.blackL};
 `
 
 const LandInfoBox = styled.div`
@@ -810,8 +867,8 @@ const LandInfoBox = styled.div`
     border: 2px solid rgba(184, 184, 184, 1);
     border-radius: 4px;
 
-    width: ${(props) => (props.isMobile ? "44vw" : "100px")};
-    height: 52px;
+    width: ${(props) => (props.isMobile ? "44vw" : "215px")};
+    height: 68px;
 `
 
 const LandInfoUsePlanBox = styled.div`

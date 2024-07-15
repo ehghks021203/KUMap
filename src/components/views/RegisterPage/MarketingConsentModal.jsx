@@ -5,7 +5,9 @@ import palette from '../../../lib/styles/colorPalette';
 
 function Modal({ className, onClose, visible, children }) {
     const handleClose = () => {
-        onClose?.();
+        if (onClose) {
+            onClose();
+        }
     };
     return (
         <>
