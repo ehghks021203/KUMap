@@ -3,11 +3,11 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import axios from "axios";
 
-import MainPage from "./components/views/MainPage/MainPage";
-import LoginPage from "./components/views/LoginPage/LoginPage";
-import RegisterPage from "./components/views/RegisterPage/RegisterPage";
-import ErrorPage from "./components/views/ErrorPage/ErrorPage";
-import LoadingPage from "./components/views/LoadingPage/LoadingPage";
+import MainPage from "./pages/MainPage/MainPage";
+import LoginPage from "./pages/LoginPage/LoginPage";
+import RegisterPage from "./pages/RegisterPage/RegisterPage";
+import ErrorPage from "./pages/ErrorPage/ErrorPage";
+import LoadingPage from "./pages/LoadingPage/LoadingPage";
 import { useEffect, useState } from "react";
 
 function App() {

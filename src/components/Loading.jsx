@@ -1,8 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import palette from '../lib/styles/colorPalette';
+import palette from '../constants/styles';
 import { MoonLoader } from "react-spinners";
-import Spinner from "../assets/spinner/list_loading.gif";
 
 
 function Loading({ loadingAddr="", type="" }) {
