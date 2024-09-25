@@ -6,7 +6,7 @@ import { BeatLoader } from "react-spinners";
 import Loading from "../../../components/Loading";
 // import style components
 import palette from "../../../constants/styles";
-import { LandDataAddrText, LandDataBox, LandDataContainer, LandDataMiniText, LandDataPricePerText, LandDataPriceText, LandDataSubtitleText, LandDataText, LandDataTitleText, LandDataUsePlanBox, Content, RoadViewButton, LikeButton, RegisterButton, LikeCountText, DivLine, ViewLandReportButton, Map } from "../../../styles/LandDetails.styles";
+import { LandDataAddrText, LandDataBox, LandDataContainer, LandDataMiniText, LandDataPricePerText, LandDataPriceText, LandDataSubtitleText, LandDataText, LandDataTitleText, LandDataUsePlanBox, Content, RoadViewButton, LikeButton, RegisterButton, LikeCountText, DivLine, ViewLandReportButton, Map, LandPropertyAreaText, LandPropertyPriceText, LandPropertySummaryContainer } from "../../../styles/LandDetails.styles";
 // import constants
 import { LAND_TYPES } from "../../../constants/enums";
 // import functions
@@ -63,10 +63,10 @@ const LandDetails = ({ isMobile=false, setRegLandData, openLandReportModal }) =>
     const [auctionType, setAuctionType] = useState("");
     const [auctionLandList, setAuctionLandList] = useState([]);
 
-    const [propertyData, setPropertyData] = useState(null);
-    const [propertyArea, setPropertyArea] = useState(0.0);
-    const [propertyPrice, setPropertyPrice] = useState(0);
-    const [propertySummary, setPropertySummary] = useState("");
+    const [landPropertyData, setLandPropertyData] = useState(null);
+    const [landPropertyArea, setLandPropertyArea] = useState(0.0);
+    const [landPropertyPrice, setLandPropertyPrice] = useState(0);
+    const [landPropertySummary, setLandPropertySummary] = useState("");
     const [ownerNickname, setOwnerNickname] = useState("");
 
     const [totalLike, setTotalLike] = useState("0");
@@ -98,7 +98,7 @@ const LandDetails = ({ isMobile=false, setRegLandData, openLandReportModal }) =>
             setDealChart(response.data.data.land_trade_list);
 
             setAuctionData(response.data.data.bid_data);
-            setPropertyData(response.data.data.property_data);
+            setLandPropertyData(response.data.data.land_property_data);
             setTotalLike(response.data.data.total_like);
             //setUserLike(landData["user_like"]);s
             
@@ -116,13 +116,14 @@ const LandDetails = ({ isMobile=false, setRegLandData, openLandReportModal }) =>
                 setAuctionStartDate(response.data.data.bid_data.case_info.bid_start_date);
                 setAuctionType(response.data.data.bid_data.case_info.bid_type);
             }
-
+            console.log(response.data.data);
             // 매물 정보 저장
-            if (response.data.data.property_data !== null) {
-                setPropertyLandArea(response.data.data.property_data.land_area);
-                setPropertyLandPrice(response.data.data.property_data.land_price);
-                setPropertyLandSummary(response.data.data.property_data.land_summary);
-                setOwnerNickname(response.data.data.property_data.nickname);
+            setLandPropertyData(response.data.data.land_property_data);
+            if (response.data.data.land_property_data !== null) {
+                setLandPropertyArea(response.data.data.land_property_data.land_area);
+                setLandPropertyPrice(response.data.data.land_property_data.land_price);
+                setLandPropertySummary(response.data.data.land_property_data.land_summary);
+                setOwnerNickname(response.data.data.land_property_data.nickname);
             }
         })
         .catch(error => {
@@ -233,14 +234,15 @@ const LandDetails = ({ isMobile=false, setRegLandData, openLandReportModal }) =>
     const HandlerRegisterButton = () => {
         if (!userLoginStatus) {
             window.alert("매물 등록 기능을 이용하시려면 로그인 해 주세요.");
-        } else if (propertyData !== null) {
+        } else if (landPropertyData !== null) {
             window.alert("이미 등록되어 있는 땅입니다.");
         
-        } else if (propertyData === null) {
-            let land = landAddress;
-            land["land_area"] = landArea;
-            land["land_predict_price"] = Math.floor(predPrice * landArea);
-            setRegLandData(land);
+        } else if (landPropertyData === null) {
+            setRegLandData({
+                ...landAddress,
+                land_area: landArea,
+                land_predict_price: Math.floor(predPrice * landArea),
+            });
         } 
     }
 
@@ -281,9 +283,9 @@ const LandDetails = ({ isMobile=false, setRegLandData, openLandReportModal }) =>
                     </LikeButton>
                     <RegisterButton 
                         onClick={() => HandlerRegisterButton()} 
-                        style={propertyData === null ? {backgroundColor: palette.grayM, color: palette.whiteL} : {backgroundColor: palette.whiteL, color: palette.grayM}}
+                        style={landPropertyData === null ? {backgroundColor: palette.grayM, color: palette.whiteL} : {backgroundColor: palette.whiteL, color: palette.grayM}}
                     >
-                        {propertyData === null ? "매물 등록" : ownerNickname + "님의 토지"}
+                        {landPropertyData === null ? "매물 등록" : ownerNickname + "님의 토지"}
                     </RegisterButton>
                     <div style={{marginTop: "300px"}}></div>
 
@@ -315,13 +317,13 @@ const LandDetails = ({ isMobile=false, setRegLandData, openLandReportModal }) =>
                         </div>
                     }
                     <DivLine/>
-                    { propertyData !== null && (
+                    { landPropertyData !== null && (
                         <div style={{width:"94%"}}>
                             <LandDataTitleText>매물 정보</LandDataTitleText><br/>
                             <div style={{display:"flex", flexDirection: "column", alignItems: "center"}}>
-                                <SaleAreaText>{landClassification} {saleLandArea}m²</SaleAreaText>
-                                <SalePriceText>{Math.floor(saleLandPrice).toLocaleString('ko-KR')}원</SalePriceText>
-                                <SaleSummaryContainer>{saleLandSummary}</SaleSummaryContainer>
+                                <LandPropertyAreaText>{landClassification} {landPropertyArea}m²</LandPropertyAreaText>
+                                <LandPropertyPriceText>{Math.floor(landPropertyPrice).toLocaleString('ko-KR')}원</LandPropertyPriceText>
+                                <LandPropertySummaryContainer>{landPropertySummary}</LandPropertySummaryContainer>
                             </div>
                             <DivLine/> 
                         </div>

@@ -199,7 +199,7 @@ export const ViewLandReportButton = styled.button`
 
 
 // 매물 스타일
-export const SaleAreaText = styled.span`
+export const LandPropertyAreaText = styled.span`
     display: block;
     width: 100%;
     margin-top: 20px;
@@ -209,7 +209,7 @@ export const SaleAreaText = styled.span`
     color: #343a40;
 `
 
-export const SalePriceText = styled.h2`
+export const LandPropertyPriceText = styled.h2`
     width: 100%;
     margin-top: 0px;
     text-align: center;
@@ -218,7 +218,7 @@ export const SalePriceText = styled.h2`
     color: #0067a3;
 `
 
-export const SaleSummaryContainer = styled.div`
+export const LandPropertySummaryContainer = styled.div`
     background-color: #b8dff8;
     width: 420px;
     height: 68px;

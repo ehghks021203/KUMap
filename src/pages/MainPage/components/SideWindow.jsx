@@ -3,8 +3,6 @@ import React from "react";
 import { useDispatch, useSelector } from 'react-redux';
 // import components
 import LandInfo from "./LandDetails";
-import BidList from "./AuctionList";
-import SaleList from "./PropertyListings";
 import RegionLand from "./RegionLand";
 import ClustererLand from "./ClustererLand";
 // import style components
@@ -16,7 +14,7 @@ import { LAND_TYPES } from "../../../constants/enums";
 import { setSideStatus } from '../../../store/actions/globalValues';
 import LandDetails from "./LandDetails";
 import AuctionList from "./AuctionList";
-import PropertyListings from "./PropertyListings";
+import LandPropertyList from "./LandPropertyList";
 
 
 function SideWindow ({ isMobile=false, setRegLandData, openLandReportModal }) {
@@ -33,12 +31,12 @@ function SideWindow ({ isMobile=false, setRegLandData, openLandReportModal }) {
                 <TopMenu>
                     <TopButton isCheck={sideStatus === "land-info"} onClick={() => dispatch(setSideStatus("land-info"))}>토지 정보</TopButton>
                     <TopButton isCheck={sideStatus === "auction-list"}  onClick={() => dispatch(setSideStatus("auction-list"))}>경매 목록</TopButton>
-                    <TopButton isCheck={sideStatus === "property-listings"} onClick={() => dispatch(setSideStatus("property-listings"))}>매물 목록</TopButton>
+                    <TopButton isCheck={sideStatus === "land-property-list"} onClick={() => dispatch(setSideStatus("land-property-list"))}>매물 목록</TopButton>
                 </TopMenu>
                 {sideStatus === "land-info" && (
                     landAddress === null ?
                     <LandDetails setRegLandData={setRegLandData} openLandReportModal={openLandReportModal}/> :
-                    landAddress.type == LAND_TYPES.LAND_INFO ? 
+                    landAddress.type == LAND_TYPES.LAND_INFO || landAddress.type == LAND_TYPES.MARKER_LAND_INFO ? 
                     <LandDetails setRegLandData={setRegLandData} openLandReportModal={openLandReportModal}/> :
                     landAddress.type == LAND_TYPES.CLUSTERER_LAND ?
                     <ClustererLand/> :
@@ -46,7 +44,7 @@ function SideWindow ({ isMobile=false, setRegLandData, openLandReportModal }) {
                 )
                 }
                 {sideStatus === "auction-list" && <AuctionList />}
-                {sideStatus === "property-listings" && <PropertyListings />}
+                {sideStatus === "land-property-list" && <LandPropertyList />}
             </SideWindowContainer>
         );
     } else {

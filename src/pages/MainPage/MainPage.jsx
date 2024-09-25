@@ -15,6 +15,7 @@ import LandReportModal from "./components/LandReportModal";
 import AddressSearchBar from "../../components/shared/AddressSearchBar";
 
 import { ReactComponent as SearchIcon } from "../../assets/images/icons/search.svg";
+import { fetchUserVerification } from "../../utils/api";
 
 
 function MainPage() {
@@ -39,9 +40,8 @@ function MainPage() {
     // 유저 토큰 검증 함수
     const UserVerification = () => {
         // 유저의 로컬스토리지에 있는 토큰 유효성 검사
-        axios.get(`${process.env.REACT_APP_API_URL}/protected`, {
-            headers: {Authorization: "Bearer " + localStorage.getItem("access_token"),},
-        }).then(function(response) {
+        fetchUserVerification()
+        .then(function(response) {
             // 유저의 토큰이 유효함
             dispatch(setCurrUser({
                 user: response.data.user,

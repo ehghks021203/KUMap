@@ -5,8 +5,8 @@ export const SET_LAND_DATA = "SET_LAND_DATA";
 export const SET_LAND_DATA_LOADING = "SET_LAND_DATA_LOADING";
 export const SET_AUCTION_LIST = "SET_AUCTION_LIST";
 export const SET_AUCTION_LIST_LOADING = "SET_AUCTION_LIST_LOADING";
-export const SET_PROPERTY_LISTINGS = "SET_PROPERTY_LISTINGS";
-export const SET_PROPERTY_LISTINGS_LOADING = "SET_PROPERTY_LISTINGS_LOADING";
+export const SET_LAND_PROPERTY_LIST = "SET_LAND_PROPERTY_LIST";
+export const SET_LAND_PROPERTY_LIST_LOADING = "SET_LAND_PROPERTY_LIST_LOADING";
 
 // action constructors
 export const setSideStatus = (sideStatus) => ({
@@ -37,13 +37,13 @@ export const setAuctionListLoading = (isAuctionListLoading) => ({
     type: SET_AUCTION_LIST_LOADING,
     payload: isAuctionListLoading
 });
-export const setPropertyListings = (propertyListings) => ({
-    type: SET_PROPERTY_LISTINGS,
-    payload: propertyListings
+export const setLandPropertyList = (landPropertyList) => ({
+    type: SET_LAND_PROPERTY_LIST,
+    payload: landPropertyList
 });
-export const setPropertyListingsLoading = (isPropertyListingsLoading) => ({
-    type: SET_PROPERTY_LISTINGS_LOADING,
-    payload: isPropertyListingsLoading
+export const setLandPropertyListLoading = (isLandPropertyListLoading) => ({
+    type: SET_LAND_PROPERTY_LIST_LOADING,
+    payload: isLandPropertyListLoading
 });
 
 

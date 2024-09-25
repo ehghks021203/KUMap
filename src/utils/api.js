@@ -16,12 +16,20 @@ let regionLandListDataCancelToken = null;
 let landDataCancelToken = null;
 let landReportDataCancelToken = null;
 let auctionListDataCancelToken = null;
+let landPropertyListDataCancelToken = null;
 let landLikeCancelToken = null;
 let userLandLikeListDataCancelToken = null;
+let registerLandPropertyCancleToken = null;
 let userPropertyListingsDataCancelToken = null;
 
 
 // API 요청 함수 정의
+// 유저 검증 api
+export const fetchUserVerification = () => {
+    return api.get("/protected", {
+        headers: { Authorization: "Bearer " + localStorage.getItem("access_token") }
+    })
+}
 // 선택된 토지의 주소 정보 받아오기
 export const fetchLandAddressByCoordinates = (params) => {
     console.log(params)
@@ -117,9 +125,21 @@ export const fetchAuctionListData = (params) => {
     }
     auctionListDataCancelToken = axios.CancelToken.source();
 
-    return api.get("/get_bid_list", {
+    return api.get("/get_auction_list", {
         params, 
         cancelToken: auctionListDataCancelToken.token
+    });
+}
+// 토지 매물 목록 받아오기
+export const fetchLandPropertyListData = (params) => {
+    if (landPropertyListDataCancelToken) {
+        landPropertyListDataCancelToken.cancel("New request made, canceling previous request.");
+    }
+    landPropertyListDataCancelToken = axios.CancelToken.source();
+
+    return api.get("/get_land_property_list", {
+        params, 
+        cancelToken: landPropertyListDataCancelToken.token
     });
 }
 // 토지 좋아요
@@ -142,6 +162,18 @@ export const fetchUserLandLikeListData = (data) => {
 
     return api.post("/user_land_like_list", data, {
         cancelToken: userLandLikeListDataCancelToken.token
+    });
+}
+// 매물 등록
+export const fetchRegisterLandProperty = (data) => {
+    if (registerLandPropertyCancleToken) {
+        registerLandPropertyCancleToken.cancel("New request made, canceling previous request.");z
+    }
+    registerLandPropertyCancleToken = axios.CancelToken.source();
+
+    return api.post("/register_land_property", data, {
+        headers: { Authorization: "Bearer " + localStorage.getItem("access_token"), "Content-Type": "application/json" },
+        cancelToken: registerLandPropertyCancleToken.token
     });
 }
 // 사용자가 올린 매물 목록 받아오기

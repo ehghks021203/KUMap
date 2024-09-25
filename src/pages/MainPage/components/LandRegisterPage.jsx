@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { setPrevCenterAddr } from '../../../store/actions/globalValues';
+import { setLandAddress } from '../../../store/actions/globalValues';
 import axios from "axios";
 import styled from "styled-components";
+// import constants
+import { LAND_TYPES } from "../../../constants/enums";
+import { fetchRegisterLandProperty } from "../../../utils/api";
 
 const LandRegisterPage = ({ isMobile=false, currUserData, regLandData, setRegLandData, LoadLand }) => {
     // 전역변수 관리리
@@ -24,14 +27,11 @@ const LandRegisterPage = ({ isMobile=false, currUserData, regLandData, setRegLan
 
 
     const HandlerRegButton = () => {
-        axios.post("https://csgpu.kku.ac.kr:5001/land_for_sale", {
-            "email": currUserData.email,
-            "lat": regLandData.lat,
-            "lng": regLandData.lng,
-        })
+        fetchRegisterLandProperty({ lat: regLandData.lat, lng: regLandData.lng })
         .then(function(regResponse) {
             console.log(regResponse);
             // 토지 데이터 다시 로드
+            dispatch(setLandAddress({ type: LAND_TYPES.LAND_INFO, lat: land.lat, lng: land.lng, address: land.address, pnu: land.pnu }));
             LoadLand(regLandData.lat, regLandData.lng);
         })
         setRegLandData({"type":"none"});
@@ -71,25 +71,14 @@ const LandRegisterPage = ({ isMobile=false, currUserData, regLandData, setRegLan
                 }
                 setCircleActice(circleActive + 1);
             } else if (circleActive === 4) {
-                axios.post(`${process.env.REACT_APP_API_URL}/reg_land_for_sale`, {
-                    "land_area": landArea,
-                    "land_price": landPrice * 10000,
-                    "land_summary": summary,
-                    "lat": regLandData.lat,
-                    "lng": regLandData.lng,
-                }, {
-                    headers: {
-                        "Authorization": "Bearer " + localStorage.getItem("access_token"),
-                        "Content-Type": "application/json",
-                    }
-                }).then(function(regResponse) {
-                    console.log(regResponse);
+                fetchRegisterLandProperty({ lat: regLandData.lat, lng: regLandData.lng, land_area: Number(landArea.replaceAll(",", "")), land_price: Number(landPrice.replaceAll(",", "")), land_summary: summary })
+                .then(function(response) {
+                    console.log(response);
+                    window.alert("매물 등록이 완료되었습니다.");
                     // 토지 데이터 다시 로드
-                    LoadLand(regLandData.lat, regLandData.lng);
+                    dispatch(setLandAddress({ type: LAND_TYPES.LAND_INFO, lat: regLandData.lat, lng: regLandData.lng, address: regLandData.address, pnu: regLandData.pnu }));
                 })
-                window.alert("매물 등록이 완료되었습니다.");
-                dispatch(setPrevCenterAddr(""));
-                setRegLandData({"type":"none"});
+                setRegLandData(null);
             }
         } else {
             if (circleActive > 1) {

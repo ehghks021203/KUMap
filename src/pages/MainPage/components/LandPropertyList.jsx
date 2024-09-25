@@ -2,22 +2,26 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import palette from '../../../constants/styles';
 import styled from "styled-components";
-
+// import constants
+import { LAND_TYPES } from "../../../constants/enums";
 import { useDispatch, useSelector } from 'react-redux';
-import { setLandInfo } from '../../../store/actions/globalValues';
+import { setLandAddress } from '../../../store/actions/globalValues';
 import Loading from "../../../components/Loading";
 
-const PropertyListings = ({ isMobile=false, LoadLand }) => {
+const LandPropertyList = ({ isMobile=false }) => {
+    // 전역 변수 관리
+    const dispatch = useDispatch();
     const centerAddress = useSelector(state => state.globalValues.centerAddress);
-    const propertyListings = useSelector(state => state.globalValues.propertyListings);
+    const landPropertyList = useSelector(state => state.globalValues.landPropertyList);
     const isLoading = useSelector(state => state.globalValues.saleLoading);
 
     function handleSalePageOpen(property) {
+        console.log(property)
         const _landAddress = {
             type: LAND_TYPES.LAND_INFO,
             lat: property.lat,
             lng: property.lng,
-            address: property.addr,
+            address: property.address,
             pnu: property.pnu,
         };
         dispatch(setLandAddress(_landAddress));
@@ -31,7 +35,7 @@ const PropertyListings = ({ isMobile=false, LoadLand }) => {
                     <CenterAddrText>{centerAddress.address}</CenterAddrText>
                     <div style={{width:"500px", display:"flex", justifyContent:"space-between"}}>
                         <SaleListMiniText style={{width:"130px"}}>토지 매물</SaleListMiniText>
-                        <SaleListMiniText style={{width:"120px"}}>총 {propertyListings.length}개</SaleListMiniText>
+                        <SaleListMiniText style={{width:"120px"}}>총 {landPropertyList.length}개</SaleListMiniText>
                     </div>
                     {isLoading ? (
                         <Loading
@@ -39,10 +43,10 @@ const PropertyListings = ({ isMobile=false, LoadLand }) => {
                             type="매물"
                         />
                     ) : (
-                        propertyListings.length === 0 ? (
+                        landPropertyList.length === 0 ? (
                             <NoResultsText>조건에 맞는 검색 결과가 없습니다.</NoResultsText>
                         ) : (
-                            propertyListings.map((sale, index) => {
+                            landPropertyList.map((sale, index) => {
                                 return (
                                     <SaleListButton onClick={() => handleSalePageOpen(sale)}>
                                         <SaleListInfo>
@@ -192,4 +196,4 @@ const SaleListMiniText = styled.span`
     color: #495057;
 `
 
-export default PropertyListings;
+export default LandPropertyList;

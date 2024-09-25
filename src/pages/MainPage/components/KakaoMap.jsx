@@ -12,8 +12,8 @@ import { MapContainer, MapButton } from "../../../styles/KakaoMap.styles";
 import { ZOOM_LEVELS, LAND_TYPES } from "../../../constants/enums";
 // import functions
 import axios from "axios";
-import { fetchLandAddressByCoordinates, fetchLandPolygonData, fetchRegionData, fetchAuctionListData, fetchRegionLandListData } from '../../../utils/api';
-import { setAuctionList, setAuctionListLoading, setCenterAddress, setLandAddress, setSideStatus } from "../../../store/actions/globalValues";
+import { fetchLandAddressByCoordinates, fetchLandPolygonData, fetchRegionData, fetchAuctionListData, fetchRegionLandListData, fetchLandPropertyListData } from '../../../utils/api';
+import { setAuctionList, setAuctionListLoading, setLandPropertyList, setLandPropertyListLoading, setCenterAddress, setLandAddress, setSideStatus } from "../../../store/actions/globalValues";
 // import icons
 import { ReactComponent as CurrentPosIcon } from "../../../assets/images/icons/current_pos.svg";
 // import css
@@ -27,6 +27,7 @@ function KakaoMap({ addrInput }) {
     const dispatch = useDispatch();
     const landAddress = useSelector(state => state.globalValues.landAddress);
     const centerAddress = useSelector(state => state.globalValues.centerAddress);
+    const landPropertyList = useSelector(state => state.globalValues.landPropertyList);
     // 여기서 지도 및 중심좌표 변수를 선언해줘.
     const [map, setMap] = useState(null);
     const [landPolygons, setLandPolygons] = useState([]);
@@ -41,8 +42,8 @@ function KakaoMap({ addrInput }) {
     // 매물 및 경매 관련 변수
     const [showAuctionMarkers, setShowAuctionMarkers] = useState(true);
     const [auctionMarkers, setAuctionMarkers] = useState([]);
-    const [showPropertyListingMarkers, setShowPropertyListingMarkers] = useState(true);
-
+    const [showLandPropertyListMarkers, setShowLandPropertyListMarkers] = useState(true);
+    const [landPropertyMarkerData, setLandPropertyMarkerData] = useState([]);
 
     // 먼저, 여기에서 카카오맵을 초기화해.
     useEffect(() => {
@@ -95,10 +96,9 @@ function KakaoMap({ addrInput }) {
     // 중심 좌표가 변경되면 실행되는 코드
     useEffect(() => {
         if (!centerAddress) { return; }
-        console.log(centerAddress);
         if (centerAddress.address !== previousCenterAddress) {
             setPreviousCenterAddress(centerAddress.address);
-            getAuctionListData();
+            getLandListData();
         }
     }, [centerAddress]);
     
@@ -106,12 +106,11 @@ function KakaoMap({ addrInput }) {
     useEffect(() => {
         // 만약 landAddress가 null이면 아래 코드를 실행하지 않아.
         if (!landAddress || !map) { return; }
-        console.log(landAddress);
         dispatch(setSideStatus("land-info"));
         for (var i = 0; i < landPolygons.length; i++) {
             landPolygons[i].setPath(null);
         }
-        if (landAddress.type === LAND_TYPES.LAND_INFO) {
+        if (landAddress.type === LAND_TYPES.LAND_INFO || landAddress.type === LAND_TYPES.MARKER_LAND_INFO) {
             const latlng = new kakao.maps.LatLng(landAddress.lat, landAddress.lng);
             map.panTo(latlng);
             if (map.getLevel() > 4) {
@@ -221,7 +220,83 @@ function KakaoMap({ addrInput }) {
         });
     }, [regionClusterer]);
 
+    // 매물 마커 생성 및 표시
+    useEffect(() => {
+        if (!map) { return; }
+        console.log(landPropertyList);
+        var landPropertyMarker = {};
+        for (let i = 0; i < landPropertyList.length; i++) {
+            if (landPropertyList[i]["pnu"] in landPropertyMarkerData) { continue; }
 
+            // var로 변수를 선언할 경우 클로저 문제가 발생.
+            // 따라서 모든 변수들을 let으로 선언하여, 클로저 문제 해결
+            // 이거 해결하느라 삽질 오만번 한듯
+            let landPropertyData = landPropertyList[i];
+            console.log(landPropertyData);
+            let pnu = landPropertyData.pnu;
+            let price = String(landPropertyData.land_price);
+            let area = Math.floor(landPropertyData.land_area).toLocaleString('ko-KR');
+            let coords = new kakao.maps.LatLng(landPropertyData.lat, landPropertyData.lng);
+                    
+            let content = document.createElement("button");
+            content.className = "sale-overlay";
+            let landPropertyBlock = document.createElement("div");
+            landPropertyBlock.className = "sale-block";
+            content.appendChild(landPropertyBlock);
+            let landPropertyTitle = document.createElement("span");
+            landPropertyTitle.className = "sale-title";
+            landPropertyTitle.appendChild(document.createTextNode("매물"));
+            landPropertyBlock.appendChild(landPropertyTitle);
+            let landPropertyPrice = document.createElement("span");
+            landPropertyPrice.className = "sale-price";
+            landPropertyPrice.appendChild(document.createTextNode(priceFormatting(price)));
+            content.appendChild(landPropertyPrice);
+            let landPropertyArea = document.createElement("span");
+            landPropertyArea.className = "sale-area";
+            landPropertyArea.appendChild(document.createTextNode(area + "m²"));
+            content.appendChild(landPropertyArea);
+
+            content.onclick = function() {
+                const _landAddress = {
+                    type: LAND_TYPES.MARKER_LAND_INFO,
+                    lat: landPropertyData.lat,
+                    lng: landPropertyData.lng,
+                    address: landPropertyData.address,
+                    pnu: landPropertyData.pnu,
+                };
+                dispatch(setLandAddress(_landAddress));
+                customOverlay.setMap(null);
+            }
+
+            var landPropertyOverlay = new kakao.maps.CustomOverlay({
+                map: null,
+                clickable: true,
+                position: coords,
+                content: content,
+                yAnchor: 0
+            });
+
+            landPropertyMarker[pnu] = {
+                "data": landPropertyData,
+                "marker": landPropertyOverlay,
+            }
+        }
+        setLandPropertyMarkerData(landPropertyMarkerData => {
+            return {...landPropertyMarkerData, ...landPropertyMarker}   
+        })
+    }, [landPropertyList]);
+
+    useEffect(() => {
+        if (showLandPropertyListMarkers) {
+            for (var pnu in landPropertyMarkerData) {
+                landPropertyMarkerData[pnu]["marker"].setMap(map);
+            }
+        } else {
+            for (var pnu in landPropertyMarkerData) {
+                landPropertyMarkerData[pnu]["marker"].setMap(null);
+            }
+        }
+    }, [landPropertyMarkerData, showLandPropertyListMarkers]);
 
     // 카카오맵 초기화
     const initializeMap = () => {
@@ -340,19 +415,12 @@ function KakaoMap({ addrInput }) {
                 }
                 customOverlay.setMap(null); 
             }
-        } else if (map.getLevel() < 5) {
-            if (regionClusterer) {
-                for (var i = 0; i < landPolygons.length; i++) {
-                    landPolygons[i].setPath(null);
-                }
-                regionClusterer.clear();
-            }
         }
         //dispatch(setMapZoomLevel(map.getLevel()));
     };
 
     // 지도 타입 변경 함수 (스카이뷰, 일반 지도)
-    const ChangeMapType = () => {
+    const changeMapType = () => {
         if (!map) { return; }
 
         if (isSkyView) {
@@ -368,11 +436,9 @@ function KakaoMap({ addrInput }) {
         let bounds = map.getBounds();
         let sw = bounds.getSouthWest();
         let ne = bounds.getNorthEast();
-        console.log(bounds)
         // HTTP 통신
         fetchRegionData({ lat1: sw.getLat(), lng1: sw.getLng(), lat2: ne.getLat(), lng2: ne.getLng(), zoom: map.getLevel() })
         .then(response => {
-            console.log(response)
             let _regionList = response.data.data;
             let _regionMarkers = [];
             for (let i = 0; i < _regionList.length; i++) {
@@ -442,79 +508,109 @@ function KakaoMap({ addrInput }) {
         });
     }
 
-    const getAuctionListData = () => {
+    const getLandListData = () => {
         if (!map) { return; }
-        // 중앙 좌표를 기준으로 주변의 경매 목록 불러오기
-        //dispatch(setBidLoading(true));  // 로딩 상태 활성화
+        // 중앙 좌표를 기준으로 주변의 토지 목록 불러오기
         dispatch(setAuctionListLoading(true));
+        dispatch(setLandPropertyListLoading(true));
 
-        if (centerAddress.address !== previousCenterAddress) {
-            setPreviousCenterAddress(centerAddress.address);
-            fetchAuctionListData({ lat: centerAddress.lat, lng: centerAddress.lng, zoom: map.getLevel() })
-            .then(response => {
-                console.log(response);
-                let _auction_list = response.data.data;
-                dispatch(setAuctionList(_auction_list));
-                // 마커 추가
-                let b_markers = [];
-                for (let i = 0; i < _auction_list.length; i++) {
-                    // var로 변수를 선언할 경우 클로저 문제가 발생.
-                    // 따라서 모든 변수들을 let으로 선언하여, 클로저 문제 해결
-                    // 이거 해결하느라 삽질 오만번 한듯
-                    let _auction_data = _auction_list[i];
-                    let pnu = _auction_data["pnu"];
-                    let price = _auction_data["case_info"]["appraisal_price"];
-                    let area = Math.floor(_auction_data["area"]).toLocaleString("ko-KR");
-                    let latlng = new kakao.maps.LatLng(_auction_data.lat, _auction_data.lng);
-                            
-                    let content = document.createElement("button");
-                    content.className = "auction-overlay";
-                    let auction_block = document.createElement("div");
-                    auction_block.className = "auction-block";
-                    content.appendChild(auction_block);
-                    let auction_title = document.createElement("span");
-                    auction_title.className = "auction-title";
-                    auction_title.appendChild(document.createTextNode("경매"));
-                    auction_block.appendChild(auction_title);
-                    let auction_price = document.createElement("span");
-                    auction_price.className = "auction-price";
-                    auction_price.appendChild(document.createTextNode(priceFormatting(price.toString())));
-                    content.appendChild(auction_price);
-                    let auction_area = document.createElement("span");
-                    auction_area.className = "auction-area";
-                    auction_area.appendChild(document.createTextNode(area + "m²"));
-                    content.appendChild(auction_area);
-        
-                    content.onclick = function() {
-                        customOverlay.setMap(null);
-                        dispatch(setLandAddress({ type: LAND_TYPES.LAND_INFO, lat: _auction_data.lat, lng: _auction_data.lng, address: _auction_data.address, pnu: _auction_data.pnu }));
-                    }
-        
-                    var _auction_overlay = new kakao.maps.CustomOverlay({
-                        map: null,
-                        clickable: true,
-                        position: latlng,
-                        content: content,
-                        yAnchor: 0
-                    });
-        
-        
-                    _auction_markers.push({
-                        "data": _auction_data,
-                        "marker": _auction_overlay,
-                    });
-                }
-                setAuctionMarkers(_auction_markers);
-            })
-            .catch(error => {
-                if (axios.isCancel(error)) {
-                    console.error("Request canceled", error.message);
-                } else {
-                    console.log(error);
-                }
-            });
-        }
+        getAuctionListData();
+        getLandPropertyListData();
     }
+
+    const getAuctionListData = () => {
+        fetchAuctionListData({ lat: centerAddress.lat, lng: centerAddress.lng, zoom: map.getLevel() })
+        .then(response => {
+            let _auction_list = response.data.data;
+            dispatch(setAuctionList(_auction_list));
+            // 마커 추가
+            let b_markers = [];
+            for (let i = 0; i < _auction_list.length; i++) {
+                // var로 변수를 선언할 경우 클로저 문제가 발생.
+                // 따라서 모든 변수들을 let으로 선언하여, 클로저 문제 해결
+                // 이거 해결하느라 삽질 오만번 한듯
+                let _auction_data = _auction_list[i];
+                let pnu = _auction_data["pnu"];
+                let price = _auction_data["case_info"]["appraisal_price"];
+                let area = Math.floor(_auction_data["area"]).toLocaleString("ko-KR");
+                let latlng = new kakao.maps.LatLng(_auction_data.lat, _auction_data.lng);
+                        
+                let content = document.createElement("button");
+                content.className = "auction-overlay";
+                let auction_block = document.createElement("div");
+                auction_block.className = "auction-block";
+                content.appendChild(auction_block);
+                let auction_title = document.createElement("span");
+                auction_title.className = "auction-title";
+                auction_title.appendChild(document.createTextNode("경매"));
+                auction_block.appendChild(auction_title);
+                let auction_price = document.createElement("span");
+                auction_price.className = "auction-price";
+                auction_price.appendChild(document.createTextNode(priceFormatting(price.toString())));
+                content.appendChild(auction_price);
+                let auction_area = document.createElement("span");
+                auction_area.className = "auction-area";
+                auction_area.appendChild(document.createTextNode(area + "m²"));
+                content.appendChild(auction_area);
+    
+                content.onclick = function() {
+                    customOverlay.setMap(null);
+                    dispatch(setLandAddress({ type: LAND_TYPES.LAND_INFO, lat: _auction_data.lat, lng: _auction_data.lng, address: _auction_data.address, pnu: _auction_data.pnu }));
+                }
+    
+                var _auction_overlay = new kakao.maps.CustomOverlay({
+                    map: null,
+                    clickable: true,
+                    position: latlng,
+                    content: content,
+                    yAnchor: 0
+                });
+        
+        
+                _auction_markers.push({
+                    "data": _auction_data,
+                    "marker": _auction_overlay,
+                });
+            }
+            setAuctionMarkers(_auction_markers);
+        })
+        .catch(error => {
+            if (axios.isCancel(error)) {
+                console.error("Request canceled", error.message);
+            } else {
+                console.log(error);
+            }
+        });
+    }
+
+    const getLandPropertyListData = () => {
+        fetchLandPropertyListData({ lat: centerAddress.lat, lng: centerAddress.lng })
+        .then(function(response) {
+            dispatch(setLandPropertyList(response.data.data));
+            dispatch(setLandPropertyListLoading(false));    // 로딩 완료됨
+        }).catch(function(error) {
+            if (error.request) {
+            }
+        });
+    }
+
+    // 현재 위치로 이동하는 함수
+    const moveToCurrentPosition = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const locPosition = new kakao.maps.LatLng(lat, lng);
+                
+                // 지도 중심을 현재 위치로 설정
+                map.setCenter(locPosition);
+            }, () => {
+                window.alert("현재 위치를 가져오는 데 실패했습니다.");
+            });
+        } else {
+            window.alert("이 브라우저는 Geolocation을 지원하지 않습니다.");
+        }
+    };
 
     const priceFormatting = (price) => {
         if (price.length < 5) { return Math.floor(parseInt(price.substr(0, price.length))).toLocaleString('ko-KR') + "천" }
@@ -525,13 +621,13 @@ function KakaoMap({ addrInput }) {
     return (
         <MapContainer id="map">
             <AddressSearchBar map={map} />
-            <MapButton number={1}>
+            <MapButton number={1} onClick={moveToCurrentPosition}>
                 <CurrentPosIcon style={{ marginTop: "4px" }} />
             </MapButton>
             <MapButton
                 number={2}
                 style={isSkyView ? { backgroundColor: "#767676", color: "#FAFAFA" } : { backgroundColor: "#FAFAFA", color: "#767676" }}
-                onClick={() => setSkyView(!isSkyView)}
+                onClick={changeMapType}
             >
                 지도
             </MapButton>
@@ -544,8 +640,8 @@ function KakaoMap({ addrInput }) {
             </MapButton>
             <MapButton
                 number={4}
-                style={showPropertyListingMarkers ? { backgroundColor: "#0067a3", color: "#FAFAFA" } : { backgroundColor: "#FAFAFA", color: "#767676" }}
-                onClick={() => setShowPropertyListingMarkers(!showPropertyListingMarkers)}
+                style={showLandPropertyListMarkers ? { backgroundColor: "#0067a3", color: "#FAFAFA" } : { backgroundColor: "#FAFAFA", color: "#767676" }}
+                onClick={() => setShowLandPropertyListMarkers(!showLandPropertyListMarkers)}
             >
                 매물
             </MapButton>

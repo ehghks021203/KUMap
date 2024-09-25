@@ -1,8 +1,5 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
-import LandInfo from "./LandDetails";
-import BidList from "./AuctionList";
-import SaleList from "./PropertyListings";
 
 import axios from "axios";
 import palette from '../../../constants/styles';
